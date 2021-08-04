@@ -1,8 +1,9 @@
-const Thing = require('../models/sauce');
+const Thing = require('../models/stuff');
 const fs = require('fs');
 
+
 exports.createThing = (req, res, next) => {
-const thingObject = JSON.parse(req.body.thing);
+const thingObject = JSON.parse(req.body.sauce);
 delete thingObject._id;
 const thing = new Thing({
     ...thingObject,
@@ -11,7 +12,7 @@ const thing = new Thing({
 });
 thing.save()
     .then(() => res.status(201).json({ message: 'Objet enregistré !'}))
-    .catch(error => res.status(400).json({ message: 'Objet non enregistré' }));
+    .catch(error => res.status(400).json({ error }));
 };
 
 
