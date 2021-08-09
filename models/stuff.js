@@ -1,7 +1,7 @@
 const multer = require('multer');
 const mongoose = require('mongoose');
 
-const thingSchema = mongoose.Schema({
+const sauceSchema = mongoose.Schema({
     userId: { type: String, required: true },
     name: { type: String, required: true },
     manufacturer: { type: String, required: true },
@@ -12,7 +12,7 @@ const thingSchema = mongoose.Schema({
    
 });
 
-module.exports = mongoose.model('Thing', thingSchema); 
+module.exports = mongoose.model('Sauce', sauceSchema);
 
 
 
