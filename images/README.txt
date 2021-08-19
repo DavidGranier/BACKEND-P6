@@ -1,0 +1,1 @@
+Le dossier 'images' recevra les images de sauces téléchargés par les utilisateurs.
