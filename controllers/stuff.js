@@ -29,6 +29,7 @@ Sauce.findOne({
 );
 };
 
+//MODIFIER UNE SAUCE
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file ?
     {
@@ -40,6 +41,7 @@ exports.modifySauce = (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 };
 
+//SUPPRIMER UNE SAUCE
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
@@ -53,6 +55,8 @@ exports.deleteSauce = (req, res, next) => {
     .catch(error => res.status(500).json({ error }));
 };
 
+
+//ENVOYER TOUTES LES SAUCES
 exports.getAllSauce = (req, res, next) => {
 Sauce.find().then(
     (sauces) => {
@@ -67,44 +71,42 @@ Sauce.find().then(
   );
 };
 
+//LIKER OU DISLIKER UNE SAUCE
 exports.likeSauce = (req, res, next) => {
-  const userId = req.body.userId;
-  const like = req.body.like;
-  const sauceId = req.params.id;
-  Sauce.findOne({ _id: sauceId })
+  Sauce.findOne({ _id: req.params.id })
       .then(sauce => {
-          // nouvelles valeurs à modifier
-          const newValues = {
+          //RECUPERATION DES VALEURS (userLiked et userDisliked) A MODIFIER DANS LA BDD
+          const valeursSauce = {
               usersLiked: sauce.usersLiked,
               usersDisliked: sauce.usersDisliked,
               likes: 0,
-              dislikes: 0
+              dislikes: 0,
           }
-          // Différents cas:
-          switch (like) {
-              case 1:  // CAS: sauce liked
-                  newValues.usersLiked.push(userId);
+          switch (req.body.like) {
+              case 1:  //LIKE
+                  valeursSauce.usersLiked.push(req.body.userId);
                   break;
-              case -1:  // CAS: sauce disliked
-                  newValues.usersDisliked.push(userId);
+              case -1:  //DISLIKE
+                  valeursSauce.usersDisliked.push(req.body.userId);
                   break;
-              case 0:  // CAS: Annulation du like/dislike
-                  if (newValues.usersLiked.includes(userId)) {
-                      // si on annule le like
-                      const index = newValues.usersLiked.indexOf(userId);
-                      newValues.usersLiked.splice(index, 1);
+              case 0:
+                  if (valeursSauce.usersLiked.includes(req.body.userId)) {
+                      // RETIRER SON LIKE
+                      const index = valeursSauce.usersLiked.indexOf(req.body.userId);
+                      valeursSauce.usersLiked.splice(index, 1);
                   } else {
-                      // si on annule le dislike
-                      const index = newValues.usersDisliked.indexOf(userId);
-                      newValues.usersDisliked.splice(index, 1);
+                      //RETIRER SON DISLIKE
+                      const index = valeursSauce.usersDisliked.indexOf(req.body.userId);
+                      valeursSauce.usersDisliked.splice(index, 1);
                   }
                   break;
           };
-          // Calcul du nombre de likes / dislikes
-          newValues.likes = newValues.usersLiked.length;
-          newValues.dislikes = newValues.usersDisliked.length;
-          // Mise à jour de la sauce avec les nouvelles valeurs
-          Sauce.updateOne({ _id: sauceId }, newValues )
+          // CALCUL LIKE ET DISLIKE EN FONCTION DE LA LENGTH DES USERSLIKED ET USERDISLIKED
+          valeursSauce.likes = valeursSauce.usersLiked.length;
+          valeursSauce.dislikes = valeursSauce.usersDisliked.length;
+
+          //MISE A JOUR DES VALEURS
+          Sauce.updateOne({ _id: req.params.id }, valeursSauce )
               .then(() => res.status(200).json({ message: 'Sauce notée !' }))
               .catch(error => res.status(400).json({ error }))  
       })
